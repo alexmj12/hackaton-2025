@@ -68,65 +68,40 @@ describe('Agent Detection Quiz', () => {
 
   // Helper function to answer quiz questions based on the specified path
   const answerQuizQuestions = (pathData) => {
-    // We expect 5 random questions from the set of 10
-    let questionCounter = 0;
-    
-    // Function to handle each question
-    const handleQuestion = () => {
-      // Get the question text
-      cy.get('.question-content p').then(($questionText) => {
+    // The quiz presents 5 random questions from the set of 10
+    // For each question:
+    // 1. Read the question text
+    // 2. Select the answer (radio button)
+    // 3. Click PROCEED for questions 1-4, EXECUTE for question 5
+    // 4. After EXECUTE, wait 3 seconds, then verify status
+
+    for (let i = 0; i < 5; i++) {
+      cy.get('.question-content p').should('be.visible').then(($questionText) => {
         const questionText = $questionText.text().trim();
-        console.log(`Answering question: ${questionText}`);
-        
-        // Get the answer for this question based on the path data
         const expectedAnswer = pathData.questionAnswers[questionText];
-        
         if (expectedAnswer === undefined) {
           throw new Error(`Unknown question text: ${questionText}`);
         }
-        
-        // Select AFFIRMATIVE for true, NEGATIVE for false
+        // True = AFFIRMATIVE = first radio button, False = NEGATIVE = last radio button
         if (expectedAnswer) {
-          // True = AFFIRMATIVE = first radio button
-          cy.get('.radio-group input[type="radio"]').first().check({force: true});
+          cy.get('.radio-group input[type="radio"]').first().check({ force: true });
         } else {
-          // False = NEGATIVE = second radio button
-          cy.get('.radio-group input[type="radio"]').last().check({force: true});
+          cy.get('.radio-group input[type="radio"]').last().check({ force: true });
         }
-        
-        // Increment question counter
-        questionCounter++;
-        
-        // Check if this is the last question (5th)
-        cy.get('.question-progress').then(($progress) => {
-          const progressText = $progress.text();
-          const currentQuestion = parseInt(progressText.match(/\d+/)[0]);
-          const totalQuestions = parseInt(progressText.match(/OF (\d+)/)[1]);
-          
-          if (questionCounter < totalQuestions) {
-            // Not the last question, click Proceed
-            cy.get('.navigation-buttons button').click();
-            handleQuestion(); // Process the next question
-          } else {
-            // Last question, click Execute
-            cy.get('.navigation-buttons button').contains(/Execute|Submit/i).click({force: true});
-            
-            // Verify the result after a delay
-            cy.wait(1000); // Give time for result to appear
-            cy.get('.result-status, [data-testid="status-display"]', { timeout: 10000 })
-              .should('exist')
-              .and('be.visible')
-              .and('contain', pathData.expectedStatus);
-            
-            // Verify the color/status
-            cy.get('.result-status, [data-testid="status-display"]').should('contain', pathData.expectedColor);
-          }
-        });
       });
-    };
-    
-    // Start handling the first question
-    handleQuestion();
+
+      if (i <= 4) {
+        cy.get('.navigation-buttons button').contains(/PROCEED/i).click({ force: true });
+      } else {
+        cy.get('.navigation-buttons button').contains(/EXECUTE/i).click({ force: true });
+        cy.wait(3000); // Wait 3 seconds for result
+        cy.get('.result-status, [data-testid="status-display"]', { timeout: 10000 })
+          .should('exist')
+          .and('be.visible')
+          .and('contain', pathData.expectedStatus);
+        cy.get('.result-status, [data-testid="status-display"]').should('contain', pathData.expectedColor);
+      }
+    }
   };
 
   it('Green Path → Verified Rebel', () => {

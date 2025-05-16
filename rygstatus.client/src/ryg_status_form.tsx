@@ -183,7 +183,7 @@ function BoBrkRwaDetection() {
                     <div className="terminal-output">
                         {Array.from("ANALYSIS COMPLETE").map((char, i) => (
                             <span key={i} style={{ animationDelay: `${i * 0.1}s` }}>
-                                {char}
+                                {char === " " ? '\u00A0' : char}
                             </span>
                         ))}
                     </div>

@@ -13,13 +13,55 @@ enum RygStatus {
     Green = 2
 }
 
-function RygStatusForm() {
+function BoBrkRwaDetection() {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [status, setStatus] = useState<RygStatus | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [codeRain, setCodeRain] = useState<JSX.Element[]>([]);
+
+    // Generate Matrix code rain effect
+    useEffect(() => {
+        const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*ΦΨΩαβγδεζηθικλμνξοπρστυφχψω";
+        const columns: JSX.Element[] = [];
+        
+        for (let i = 0; i < 20; i++) {
+            const duration = 5 + Math.random() * 10;
+            const delay = Math.random() * 5;
+            const leftPos = Math.random() * 100;
+            const columnChars = [];
+            
+            for (let j = 0; j < 10; j++) {
+                const randomChar = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
+                columnChars.push(
+                    <div key={`char-${j}`} style={{ 
+                        opacity: 1 - (j * 0.1), 
+                        animationDelay: `${j * 0.1}s`,
+                        textShadow: '0 0 5px #00FF41'
+                    }}>
+                        {randomChar}
+                    </div>
+                );
+            }
+            
+            columns.push(
+                <div 
+                    key={`column-${i}`} 
+                    className="code-column" 
+                    style={{ 
+                        left: `${leftPos}%`, 
+                        animationDuration: `${duration}s`,
+                        animationDelay: `${delay}s`
+                    }}
+                >
+                    {columnChars}
+                </div>
+            );
+        }
+        setCodeRain(columns);
+    }, []);
 
     const getStatusClass = (status: RygStatus | null): string => {
         if (status === null) return '';
@@ -40,16 +82,19 @@ function RygStatusForm() {
     const fetchQuestions = async () => {
         try {
             setError(null);
+            // Simulate terminal loading
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
             const response = await fetch(`${baseApiUrl}/RygStatus/questions`);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Terminal connection error: ${response.status}`);
             }
             const data = await response.json();
             setQuestions(data.map((q: Question) => ({ ...q, answer: false })));
             setLoading(false);
         } catch (error) {
             console.error('Error fetching questions:', error);
-            setError('Failed to load questions. Please try again later.');
+            setError('Connection failure. System reset required.');
             setLoading(false);
         }
     };
@@ -77,6 +122,11 @@ function RygStatusForm() {
         e.preventDefault();
         try {
             setError(null);
+            setLoading(true);
+            
+            // Simulate processing animation
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             const response = await fetch(`${baseApiUrl}/RygStatus/submit`, {
                 method: 'POST',
                 headers: {
@@ -86,15 +136,17 @@ function RygStatusForm() {
             });
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Connection failure: ${response.status}`);
             }
             
             const result = await response.json();
             setStatus(result as RygStatus);
             setIsSubmitted(true);
+            setLoading(false);
         } catch (error) {
             console.error('Error submitting responses:', error);
-            setError('Failed to submit responses. Please try again.');
+            setError('Data transmission interrupted. Retry protocol initiated.');
+            setLoading(false);
         }
     };
 
@@ -105,22 +157,39 @@ function RygStatusForm() {
         fetchQuestions();
     };
 
+    const LoadingComponent = () => (
+        <div className="loading-state">
+            <div>INITIALIZING SCAN</div>
+            <div className="typing-animation">
+                <span className="cursor"></span>
+            </div>
+        </div>
+    );
+
     if (loading) {
-        return <div>Loading questions...</div>;
+        return <LoadingComponent />;
     }
 
     if (questions.length === 0) {
-        return <div>No questions available.</div>;
+        return <div className="loading-state">SYSTEM FAILURE: NO DATA AVAILABLE</div>;
     }
 
     if (isSubmitted) {
         return (
-            <div className="ryg-status-form">
+            <div className="bobrkrwa-detection">
+                <div className="code-rain">{codeRain}</div>
                 <div className={`status-result ${getStatusClass(status)}`}>
-                    <h2>Your Status Result</h2>
-                    <div className="status-text">Status: {getStatusText(status)}</div>
-                    <button className="start-over-button" onClick={handleStartOver}>
-                        Start Over
+                    <h2>DETECTION RESULTS</h2>
+                    <div className="terminal-output">
+                        {Array.from("ANALYSIS COMPLETE").map((char, i) => (
+                            <span key={i} style={{ animationDelay: `${i * 0.1}s` }}>
+                                {char}
+                            </span>
+                        ))}
+                    </div>
+                    <div className="status-text">STATUS: {getStatusText(status)}</div>
+                    <button className="matrix-button" onClick={handleStartOver}>
+                        REINITIALIZE
                     </button>
                 </div>
             </div>
@@ -132,7 +201,8 @@ function RygStatusForm() {
     const isFirstQuestion = currentQuestionIndex === 0;
 
     return (
-        <div className="ryg-status-form">
+        <div className="bobrkrwa-detection">
+            <div className="code-rain">{codeRain}</div>
             {error && (
                 <div className="error-message">
                     {error}
@@ -140,7 +210,7 @@ function RygStatusForm() {
             )}
             <div className="question-widget">
                 <div className="question-progress">
-                    Question {currentQuestionIndex + 1} of {questions.length}
+                    SEQUENCE {currentQuestionIndex + 1} OF {questions.length}
                 </div>
                 <div className="question-content">
                     <p>{currentQuestion.text}</p>
@@ -152,7 +222,7 @@ function RygStatusForm() {
                                 checked={currentQuestion.answer === true}
                                 onChange={() => handleAnswerChange(true)}
                             />
-                            Yes
+                            AFFIRMATIVE
                         </label>
                         <label>
                             <input
@@ -161,7 +231,7 @@ function RygStatusForm() {
                                 checked={currentQuestion.answer === false}
                                 onChange={() => handleAnswerChange(false)}
                             />
-                            No
+                            NEGATIVE
                         </label>
                     </div>
                 </div>
@@ -171,12 +241,12 @@ function RygStatusForm() {
                         onClick={handlePrevious}
                         disabled={isFirstQuestion}
                     >
-                        Previous
+                        BACK
                     </button>
                     {isLastQuestion ? (
-                        <button type="button" onClick={handleSubmit}>Submit</button>
+                        <button type="button" onClick={handleSubmit}>EXECUTE</button>
                     ) : (
-                        <button type="button" onClick={handleNext}>Next</button>
+                        <button type="button" onClick={handleNext}>PROCEED</button>
                     )}
                 </div>
             </div>
@@ -184,4 +254,4 @@ function RygStatusForm() {
     );
 }
 
-export default RygStatusForm;
+export default BoBrkRwaDetection;

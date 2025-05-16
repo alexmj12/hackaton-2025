@@ -5,15 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b4222113-7d97-447f-a463-7c2f9d51704a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rygstatus.client/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/rygstatus.client/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rygstatus.client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/rygstatus.client/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rygstatus.client/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/rygstatus.client/src/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rygstatus.client/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/rygstatus.client/src/index.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rygstatus.client/src/ryg_status_form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/rygstatus.client/src/ryg_status_form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rygstatus.client/src/status_form_styles.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rygstatus.client/src/status_form_styles2.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rygstatus.client/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/rygstatus.client/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +47,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "ui-experiments",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",

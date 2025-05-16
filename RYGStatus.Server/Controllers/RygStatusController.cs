@@ -9,10 +9,12 @@ namespace RYGStatus.Server.Controllers
     public class RygStatusController : ControllerBase
     {
         private readonly IQuestionService _questionService;
-    
-        public RygStatusController(IQuestionService questionService)
+        private readonly IAnalyzeService _analyzeService;
+
+        public RygStatusController(IQuestionService questionService, IAnalyzeService analyzeService)
         {
             _questionService = questionService;
+            _analyzeService = analyzeService;
         }
 
         [HttpGet("questions")]
@@ -24,22 +26,18 @@ namespace RYGStatus.Server.Controllers
             return Ok(randomQuestions.Select(q => new { q.Id, q.Text }));
         }
 
+        [HttpGet("test")]
+        public ActionResult<RygStatus> Test()
+        {
+            var questions = _questionService.GetQuestions();
+
+            return _analyzeService.Analyze(questions);
+        }
+
         [HttpPost("submit")]
         public ActionResult<RygStatus> SubmitResponses([FromBody] List<Question> responses)
         {
-            if (responses.Any(r => r.Answer == null))
-            {
-                return BadRequest("All questions must be answered before submitting.");
-            }
-
-            var trueCount = responses.Count(r => r.Answer.GetValueOrDefault());
-
-            if (responses.All(r => r.Answer.GetValueOrDefault()))
-                return Ok(RygStatus.Red);
-            else if (trueCount > 4)
-                return Ok(RygStatus.Yellow);
-            else
-                return Ok(RygStatus.Green);
+            return _analyzeService.Analyze(responses);
         }
     }
 }

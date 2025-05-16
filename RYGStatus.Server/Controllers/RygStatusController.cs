@@ -22,8 +22,7 @@ namespace RYGStatus.Server.Controllers
         {
             var random = new Random();
             var questions = _questionService.GetQuestions();
-            var randomQuestions = questions.OrderBy(x => random.Next()).Take(5);
-            return Ok(randomQuestions.Select(q => new { q.Id, q.Text }));
+            return Ok(questions.Select(q => new { q.Id, q.Text }));
         }
 
         [HttpPost("submit")]

@@ -78,7 +78,7 @@ public class AnalyzeService : IAnalyzeService
             messages.Add(new ChatMessage
             {
                 Role = "user",
-                Content = question.Answer ? "True" : "False"
+                Content = question.Answer.GetValueOrDefault() ? "True" : "False"
             });
         }
 

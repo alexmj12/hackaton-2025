@@ -26,18 +26,16 @@ namespace RYGStatus.Server.Controllers
             return Ok(randomQuestions.Select(q => new { q.Id, q.Text }));
         }
 
-        [HttpGet("test")]
-        public ActionResult<RygStatus> Test()
-        {
-            var questions = _questionService.GetQuestions();
-
-            return _analyzeService.Analyze(questions);
-        }
-
         [HttpPost("submit")]
         public ActionResult<RygStatus> SubmitResponses([FromBody] List<Question> responses)
         {
-            return _analyzeService.Analyze(responses);
+            if (responses.Any(r => r.Answer == null))
+            {
+                return BadRequest("All questions must be answered before submitting.");
+            }
+
+            var analysisResult = _analyzeService.Analyze(responses);
+            return Ok(analysisResult);
         }
     }
 }

@@ -1,10 +1,10 @@
-import RygStatusForm from "./ryg_status_form.tsx";
+import BoBrkRwaDetection from "./ryg_status_form.tsx";
 
 function App() {
     return (
-        <div>
-            <h1>RYG Status Assessment</h1>
-            <RygStatusForm />
+        <div className="app-container">
+            <h1>boBrkRwa Agent Detection</h1>
+            <BoBrkRwaDetection />
         </div>
     );
 }

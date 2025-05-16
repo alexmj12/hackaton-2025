@@ -6,6 +6,7 @@ interface Question {
     answer: boolean;
 }
 
+// @ts-ignore
 enum RygStatus {
     Red = 0,
     Yellow = 1,
@@ -14,9 +15,11 @@ enum RygStatus {
 
 function RygStatusForm() {
     const [questions, setQuestions] = useState<Question[]>([]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [status, setStatus] = useState<RygStatus | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const getStatusClass = (status: RygStatus | null): string => {
         if (status === null) return '';
@@ -28,8 +31,7 @@ function RygStatusForm() {
         return RygStatus[status];
     };
 
-    // Define base API URL
-    const baseApiUrl = '/api'; // You might need to adjust this based on your setup
+    const baseApiUrl = '/api';
 
     useEffect(() => {
         fetchQuestions();
@@ -52,10 +54,23 @@ function RygStatusForm() {
         }
     };
 
-    const handleAnswerChange = (questionId: number, value: boolean) => {
+    const handleAnswerChange = (value: boolean) => {
+        const currentQuestion = questions[currentQuestionIndex];
         setQuestions(questions.map(q => 
-            q.id === questionId ? { ...q, answer: value } : q
+            q.id === currentQuestion.id ? { ...q, answer: value } : q
         ));
+    };
+
+    const handleNext = () => {
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(currentQuestionIndex + 1);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(currentQuestionIndex - 1);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -76,58 +91,95 @@ function RygStatusForm() {
             
             const result = await response.json();
             setStatus(result as RygStatus);
+            setIsSubmitted(true);
         } catch (error) {
             console.error('Error submitting responses:', error);
             setError('Failed to submit responses. Please try again.');
         }
     };
 
+    const handleStartOver = () => {
+        setIsSubmitted(false);
+        setStatus(null);
+        setCurrentQuestionIndex(0);
+        fetchQuestions();
+    };
+
     if (loading) {
         return <div>Loading questions...</div>;
     }
 
+    if (questions.length === 0) {
+        return <div>No questions available.</div>;
+    }
+
+    if (isSubmitted) {
+        return (
+            <div className="ryg-status-form">
+                <div className={`status-result ${getStatusClass(status)}`}>
+                    <h2>Your Status Result</h2>
+                    <div className="status-text">Status: {getStatusText(status)}</div>
+                    <button className="start-over-button" onClick={handleStartOver}>
+                        Start Over
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    const currentQuestion = questions[currentQuestionIndex];
+    const isLastQuestion = currentQuestionIndex === questions.length - 1;
+    const isFirstQuestion = currentQuestionIndex === 0;
+
     return (
         <div className="ryg-status-form">
-            <h2>RYG Status Questions</h2>
             {error && (
                 <div className="error-message">
                     {error}
                 </div>
             )}
-            <form onSubmit={handleSubmit}>
-                {questions.map(question => (
-                    <div key={question.id} className="question-item">
-                        <p>{question.text}</p>
-                        <div className="radio-group">
-                            <label>
-                                <input
-                                    type="radio"
-                                    name={`question-${question.id}`}
-                                    checked={question.answer === true}
-                                    onChange={() => handleAnswerChange(question.id, true)}
-                                />
-                                Yes
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name={`question-${question.id}`}
-                                    checked={question.answer === false}
-                                    onChange={() => handleAnswerChange(question.id, false)}
-                                />
-                                No
-                            </label>
-                        </div>
-                    </div>
-                ))}
-                <button type="submit">Submit Responses</button>
-            </form>
-
-            {status !== null && (
-                <div className={`status-result ${getStatusClass(status)}`}>
-                    Status: {getStatusText(status)}
+            <div className="question-widget">
+                <div className="question-progress">
+                    Question {currentQuestionIndex + 1} of {questions.length}
                 </div>
-            )}
+                <div className="question-content">
+                    <p>{currentQuestion.text}</p>
+                    <div className="radio-group">
+                        <label>
+                            <input
+                                type="radio"
+                                name={`question-${currentQuestion.id}`}
+                                checked={currentQuestion.answer === true}
+                                onChange={() => handleAnswerChange(true)}
+                            />
+                            Yes
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name={`question-${currentQuestion.id}`}
+                                checked={currentQuestion.answer === false}
+                                onChange={() => handleAnswerChange(false)}
+                            />
+                            No
+                        </label>
+                    </div>
+                </div>
+                <div className="navigation-buttons">
+                    <button 
+                        type="button" 
+                        onClick={handlePrevious}
+                        disabled={isFirstQuestion}
+                    >
+                        Previous
+                    </button>
+                    {isLastQuestion ? (
+                        <button type="button" onClick={handleSubmit}>Submit</button>
+                    ) : (
+                        <button type="button" onClick={handleNext}>Next</button>
+                    )}
+                </div>
+            </div>
         </div>
     );
 }

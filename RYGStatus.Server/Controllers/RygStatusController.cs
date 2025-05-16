@@ -27,9 +27,14 @@ namespace RYGStatus.Server.Controllers
         [HttpPost("submit")]
         public ActionResult<RygStatus> SubmitResponses([FromBody] List<Question> responses)
         {
-            var trueCount = responses.Count(r => r.Answer);
+            if (responses.Any(r => r.Answer == null))
+            {
+                return BadRequest("All questions must be answered before submitting.");
+            }
 
-            if (responses.All(r => r.Answer))
+            var trueCount = responses.Count(r => r.Answer.GetValueOrDefault());
+
+            if (responses.All(r => r.Answer.GetValueOrDefault()))
                 return Ok(RygStatus.Red);
             else if (trueCount > 4)
                 return Ok(RygStatus.Yellow);

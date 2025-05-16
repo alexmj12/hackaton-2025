@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36109.1 d17.14
+VisualStudioVersion = 17.14.36109.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "rygstatus.client", "rygstatus.client\rygstatus.client.esproj", "{7629090B-E1B0-6A72-3BB9-E1458E85173B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RYGStatus.Server", "RYGStatus.Server\RYGStatus.Server.csproj", "{6AF47104-A897-4BC7-8297-AAEEC52F772E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RYGStatus.Tests", "RYGStatus.Tests\RYGStatus.Tests.csproj", "{9B7714C9-CA40-4B5F-9082-A57880324717}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{6AF47104-A897-4BC7-8297-AAEEC52F772E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AF47104-A897-4BC7-8297-AAEEC52F772E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AF47104-A897-4BC7-8297-AAEEC52F772E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B7714C9-CA40-4B5F-9082-A57880324717}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B7714C9-CA40-4B5F-9082-A57880324717}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B7714C9-CA40-4B5F-9082-A57880324717}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B7714C9-CA40-4B5F-9082-A57880324717}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

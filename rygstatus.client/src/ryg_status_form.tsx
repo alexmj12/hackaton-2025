@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
+import type { JSX } from 'react/jsx-runtime';
 
 interface Question {
     id: number;
     text: string;
     answer: boolean | null;
 }
-
 // @ts-ignore
 enum RygStatus {
     Red = 0,
@@ -236,9 +236,6 @@ function BoBrkRwaDetection() {
     const currentQuestion = questions[currentQuestionIndex];
     const isLastQuestion = currentQuestionIndex === questions.length - 1;
     const isFirstQuestion = currentQuestionIndex === 0;
-    
-    const isCurrentQuestionAnswered = currentQuestion.answer !== null;
-
     return (
         <div className="bobrkrwa-detection">
             <div className="code-rain">{codeRain}</div>
@@ -260,6 +257,7 @@ function BoBrkRwaDetection() {
                                 name={`question-${currentQuestion.id}`}
                                 checked={currentQuestion.answer === true}
                                 onChange={() => handleAnswerChange(true)}
+                                data-test-id={`question-${currentQuestion.id}-affirmative`}
                             />
                             AFFIRMATIVE
                         </label>
@@ -269,6 +267,7 @@ function BoBrkRwaDetection() {
                                 name={`question-${currentQuestion.id}`}
                                 checked={currentQuestion.answer === false}
                                 onChange={() => handleAnswerChange(false)}
+                                data-test-id={`question-${currentQuestion.id}-negative`}
                             />
                             NEGATIVE
                         </label>

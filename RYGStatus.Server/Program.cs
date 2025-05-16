@@ -1,4 +1,8 @@
 using RYGStatus.Server.Services;
+using DotNetEnv;
+
+// Load environment variables from .env file
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddHttpClient(); // Register IHttpClientFactory
 builder.Services.AddSingleton<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IAnalyzeService, AnalyzeService>();
 
 // Add Swagger UI
 builder.Services.AddSwaggerGen();

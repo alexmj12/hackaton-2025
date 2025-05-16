@@ -185,12 +185,20 @@ function BoBrkRwaDetection() {
         }
     };
 
-    const handleStartOver = () => {
+    const handleStartOver = async () => {
+        // Set loading to true first to show loading state
+        setLoading(true);
+        // Clear previous data
+        setQuestions([]);
+        
+        // Wait for fetch to complete before changing view
+        await fetchQuestions();
+        
+        // Then update the UI state
         setIsSubmitted(false);
         setStatus(null);
         setCurrentQuestionIndex(0);
         setShowSelectionWarning(false);
-        fetchQuestions();
     };
 
     const LoadingComponent = () => (

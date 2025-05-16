@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { JSX } from 'react/jsx-runtime';
 
 interface Question {
@@ -23,6 +23,34 @@ function BoBrkRwaDetection() {
     const [codeRain, setCodeRain] = useState<JSX.Element[]>([]);
     // Add state to track whether to show warning
     const [showSelectionWarning, setShowSelectionWarning] = useState(false);
+    // Add ref for audio element
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    // Add effect to play background music when component mounts
+    useEffect(() => {
+        // Create audio element
+        audioRef.current = new Audio('/background-music.mp3');
+        
+        // Set audio properties
+        if (audioRef.current) {
+            audioRef.current.loop = true;
+            audioRef.current.volume = 0.5; // Set volume to 50%
+            audioRef.current.currentTime = 25; // Start from the 25-second mark
+            
+            // Play the audio
+            audioRef.current.play().catch(error => {
+                console.error('Audio playback failed:', error);
+            });
+        }
+        
+        // Cleanup function to stop music when component unmounts
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
+        };
+    }, []);
 
     // Matrix code rain effect remains unchanged
     useEffect(() => {

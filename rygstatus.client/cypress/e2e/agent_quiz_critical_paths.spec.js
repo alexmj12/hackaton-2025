@@ -68,14 +68,14 @@ describe('Agent Detection Quiz', () => {
 
   // Helper function to answer quiz questions based on the specified path
   const answerQuizQuestions = (pathData) => {
-    // The quiz presents 5 random questions from the set of 10
+    // The quiz now presents all 10 questions
     // For each question:
     // 1. Read the question text
     // 2. Select the answer (radio button)
-    // 3. Click PROCEED for questions 1-4, EXECUTE for question 5
+    // 3. Click PROCEED for questions 1-9, EXECUTE for question 10
     // 4. After EXECUTE, wait 3 seconds, then verify status
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 10; i++) {
       cy.get('.question-content p').should('be.visible').then(($questionText) => {
         const questionText = $questionText.text().trim();
         const expectedAnswer = pathData.questionAnswers[questionText];
@@ -90,7 +90,7 @@ describe('Agent Detection Quiz', () => {
         }
       });
 
-      if (i <= 4) {
+      if (i <= 9) {
         cy.get('.navigation-buttons button').contains(/PROCEED/i).click({ force: true });
       } else {
         cy.get('.navigation-buttons button').contains(/EXECUTE/i).click({ force: true });

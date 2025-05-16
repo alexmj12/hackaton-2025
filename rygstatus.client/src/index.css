@@ -488,3 +488,17 @@ button:disabled {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+.input-requirement {
+  color: #FF3333;
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  text-align: center;
+  opacity: 0.8;
+  font-style: italic;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+}

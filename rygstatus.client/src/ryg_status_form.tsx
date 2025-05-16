@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 interface Question {
     id: number;
     text: string;
-    answer: boolean;
+    answer: boolean | null;
 }
 
 // @ts-ignore
@@ -21,8 +21,10 @@ function BoBrkRwaDetection() {
     const [error, setError] = useState<string | null>(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [codeRain, setCodeRain] = useState<JSX.Element[]>([]);
+    // Add state to track whether to show warning
+    const [showSelectionWarning, setShowSelectionWarning] = useState(false);
 
-    // Generate Matrix code rain effect
+    // Matrix code rain effect remains unchanged
     useEffect(() => {
         const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*ΦΨΩαβγδεζηθικλμνξοπρστυφχψω";
         const columns: JSX.Element[] = [];
@@ -63,6 +65,7 @@ function BoBrkRwaDetection() {
         setCodeRain(columns);
     }, []);
 
+    // Status helper functions unchanged
     const getStatusClass = (status: RygStatus | null): string => {
         if (status === null) return '';
         return RygStatus[status].toLowerCase();
@@ -90,7 +93,8 @@ function BoBrkRwaDetection() {
                 throw new Error(`Terminal connection error: ${response.status}`);
             }
             const data = await response.json();
-            setQuestions(data.map((q: Question) => ({ ...q, answer: false })));
+            // Set answer to null initially (unselected)
+            setQuestions(data.map((q: Question) => ({ ...q, answer: null })));
             setLoading(false);
         } catch (error) {
             console.error('Error fetching questions:', error);
@@ -104,22 +108,53 @@ function BoBrkRwaDetection() {
         setQuestions(questions.map(q => 
             q.id === currentQuestion.id ? { ...q, answer: value } : q
         ));
+        // Hide the warning when user makes a selection
+        setShowSelectionWarning(false);
     };
 
     const handleNext = () => {
+        const currentQuestion = questions[currentQuestionIndex];
+        
+        // Check if question is answered
+        if (currentQuestion.answer === null) {
+            // Show the warning if user tries to proceed without selection
+            setShowSelectionWarning(true);
+            return;
+        }
+        
+        // If question is answered and not the last one, proceed
         if (currentQuestionIndex < questions.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
+            // Reset warning state when moving to next question
+            setShowSelectionWarning(false);
         }
     };
 
     const handlePrevious = () => {
         if (currentQuestionIndex > 0) {
             setCurrentQuestionIndex(currentQuestionIndex - 1);
+            // Reset warning state when moving to previous question
+            setShowSelectionWarning(false);
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        const currentQuestion = questions[currentQuestionIndex];
+        
+        // Check if the current question has been answered
+        if (currentQuestion.answer === null) {
+            setShowSelectionWarning(true);
+            return;
+        }
+        
+        // Check if all questions have been answered
+        if (questions.some(q => q.answer === null)) {
+            setError('PROTOCOL ERROR: All assessment parameters must be configured before execution.');
+            return;
+        }
+        
         try {
             setError(null);
             setLoading(true);
@@ -154,6 +189,7 @@ function BoBrkRwaDetection() {
         setIsSubmitted(false);
         setStatus(null);
         setCurrentQuestionIndex(0);
+        setShowSelectionWarning(false);
         fetchQuestions();
     };
 
@@ -200,6 +236,8 @@ function BoBrkRwaDetection() {
     const currentQuestion = questions[currentQuestionIndex];
     const isLastQuestion = currentQuestionIndex === questions.length - 1;
     const isFirstQuestion = currentQuestionIndex === 0;
+    
+    const isCurrentQuestionAnswered = currentQuestion.answer !== null;
 
     return (
         <div className="bobrkrwa-detection">
@@ -235,6 +273,12 @@ function BoBrkRwaDetection() {
                             NEGATIVE
                         </label>
                     </div>
+                    {/* Only show warning when user has attempted to proceed */}
+                    {showSelectionWarning && (
+                        <div className="input-requirement">
+                            SELECTION REQUIRED TO PROCEED
+                        </div>
+                    )}
                 </div>
                 <div className="navigation-buttons">
                     <button 
@@ -245,9 +289,19 @@ function BoBrkRwaDetection() {
                         BACK
                     </button>
                     {isLastQuestion ? (
-                        <button type="button" onClick={handleSubmit}>EXECUTE</button>
+                        <button 
+                            type="button" 
+                            onClick={handleSubmit}
+                        >
+                            EXECUTE
+                        </button>
                     ) : (
-                        <button type="button" onClick={handleNext}>PROCEED</button>
+                        <button 
+                            type="button" 
+                            onClick={handleNext}
+                        >
+                            PROCEED
+                        </button>
                     )}
                 </div>
             </div>

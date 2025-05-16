@@ -188,6 +188,7 @@ function BoBrkRwaDetection() {
                         ))}
                     </div>
                     <div className="status-text">STATUS: {getStatusText(status)}</div>
+                    <br />
                     <button className="matrix-button" onClick={handleStartOver}>
                         REINITIALIZE
                     </button>
